@@ -32,7 +32,6 @@
 
 constexpr int LOOP_RATE = 30; //processing frequency
 
-
 int main(int argc, char **argv)
 {
 

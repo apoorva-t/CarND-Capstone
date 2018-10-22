@@ -6,7 +6,7 @@ import math
 
 GAS_DENSITY = 2.858
 ONE_MPH = 0.44704
-
+MAX_SPEED = 20  # in MPH
 
 class Controller(object):
     def __init__(self, vehicle_mass, fuel_capacity, brake_deadband, decel_limit, accel_limit,
@@ -19,7 +19,6 @@ class Controller(object):
         #kd = 0.5 
         kd = 0.
         mn = 0.0
-       # mx = 0.7 
         mx = 0.2
         self.throttle_controller = PID(kp, ki, kd, mn, mx)
         self.yaw_controller = YawController(wheel_base, steer_ratio, 0.1, max_lat_accel, max_steer_angle)
@@ -36,23 +35,22 @@ class Controller(object):
     	self.vel_lpf = LowPassFilter(tau, ts) # to filter out high frequency noise in velocity being passed
 
     	self.steer_lpf = LowPassFilter(tau=0.5, ts=0.02)
-    	self.t_lpf = LowPassFilter(tau=0.2,ts=0.02)
 
     	self.last_time = rospy.get_time()
 
     def control(self, current_vel, dbw_enabled, linear_vel, angular_vel):
         # Return throttle, brake, steer
         if not dbw_enabled:
-        	rospy.loginfo('dbw disabled')
+        	#rospy.loginfo('dbw disabled')
         	self.throttle_controller.reset()
         	return 0.0,0.0,0.0
 
         current_vel = self.vel_lpf.filt(current_vel)
 
         steering = self.yaw_controller.get_steering(linear_vel, angular_vel, current_vel)
-        #steering = self.steer_lpf.filt(steering)
+        steering = self.steer_lpf.filt(steering)
 
-        vel_error = linear_vel - current_vel
+        vel_error = min(linear_vel, MAX_SPEED*ONE_MPH) - current_vel
         self.last_vel = current_vel
 
         current_time = rospy.get_time()

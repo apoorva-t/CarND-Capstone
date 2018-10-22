@@ -12,7 +12,7 @@ import cv2
 import yaml
 from scipy.spatial import KDTree
 
-STATE_COUNT_THRESHOLD = 3
+STATE_COUNT_THRESHOLD = 2
 PROCESS_IMG_RATE = 3
 
 class TLDetector(object):
@@ -141,12 +141,32 @@ class TLDetector(object):
         cv_image = self.bridge.imgmsg_to_cv2(self.camera_image, "bgr8")
 
         #Save images
-        cv2.imwrite('foo'+str(self.img_count)+'.jpg', cv_image)
-        self.img_count += 1
+        #cv2.imwrite('foo'+str(self.img_count)+'.jpg', cv_image)
+        #self.img_count += 1
 
-        #return light.state
         #Get classification
-        return self.light_classifier.get_classification(cv_image)
+        classified_state = self.light_classifier.get_classification(cv_image)
+
+        '''
+        light_color = 'Unknown'
+        if light.state is TrafficLight.RED:
+            light_color = 'Red'
+        elif light.state is TrafficLight.GREEN:
+            light_color = 'Green'
+        elif light.state is TrafficLight.YELLOW:
+            light_color = 'Yellow'
+        class_light_color = 'Unknown'
+        if classified_state is TrafficLight.RED:
+            class_light_color = 'Red'
+        elif classified_state is TrafficLight.GREEN:
+            class_light_color = 'Green'
+        elif classified_state is TrafficLight.YELLOW:
+            class_light_color = 'Yellow'
+            
+        rospy.loginfo("Simulator traffic light: %s, classified traffic light: %s",light_color, class_light_color)
+        '''
+        #return light.state 
+        return classified_state
 
     def process_traffic_lights(self):
         """Finds closest visible traffic light, if one exists, and determines its
@@ -168,7 +188,7 @@ class TLDetector(object):
 
         #TODO find the closest visible traffic light (if one exists)
         diff = len(self.waypoints.waypoints)
-        #rospy.loginfo('Closest wp near car: %d', car_position)
+        rospy.loginfo('Closest wp near car: %d', car_position)
         for i, light in enumerate(self.lights):
             # Get stopline wp index
             line = stop_line_positions[i]
@@ -177,12 +197,12 @@ class TLDetector(object):
             d = tmp_light_idx - car_position
             # If traffic light wp is in front of car and within diff
             if d >= 0.0 and d < diff:
-                #rospy.loginfo('Traffic light wp: %d', tmp_light_idx)
+                rospy.loginfo('Traffic light wp: %d', tmp_light_idx)
                 diff = d
                 closest_light = light
                 light_wp = tmp_light_idx
 
-        if closest_light:
+        if closest_light is not None:
             state = self.get_light_state(closest_light)
             return light_wp, state
 

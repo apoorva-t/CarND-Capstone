@@ -10,13 +10,18 @@ import operator
 min_score_thresh = .5
 
 class TLClassifier(object):
-    def __init__(self):
+    def __init__(self, isSite):
         #TODO load classifier
         self.light_state = TrafficLight.UNKNOWN
         self.category_dict = {1: "Green", 2: "Yellow", 3: "Red", 4: "off"}
         dirpath = os.getcwd()
 
-        PATH_TO_FROZEN_GRAPH = dirpath + '/exported_graphs' + '/frozen_inference_graph.pb'
+        if isSite:
+            PATH_TO_FROZEN_GRAPH = dirpath + '/exported_graphs_site' + '/frozen_inference_graph.pb'
+            rospy.loginfo("Model for site")
+        else:
+            PATH_TO_FROZEN_GRAPH = dirpath + '/exported_graphs' + '/frozen_inference_graph.pb'
+            rospy.loginfo("Model for simulator")
 
         self.detection_graph = tf.Graph()
         with self.detection_graph.as_default():

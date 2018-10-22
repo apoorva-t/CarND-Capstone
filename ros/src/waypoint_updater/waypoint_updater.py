@@ -122,14 +122,14 @@ class WaypointUpdater(object):
             if i > stop_idx:
                 vel = 0
             else:
-                rospy.loginfo('Decelerate waypoints index values: %d, stop_idx: %d', i, stop_idx)
+                #rospy.loginfo('Decelerate waypoints index values: %d, stop_idx: %d', i, stop_idx)
                 dist = self.distance(waypoints, i, stop_idx)
                 vel = math.sqrt(2 * MAX_DECEL * dist)
                 if vel < 1.0:
                     vel = 0.0
 
             p.twist.twist.linear.x = min(vel, wp.twist.twist.linear.x)
-            rospy.loginfo('Waypoint velocity for index %d is %f', i, p.twist.twist.linear.x)
+            #rospy.loginfo('Waypoint velocity for index %d is %f', i, p.twist.twist.linear.x)
             tmp.append(p)
         return tmp
 
@@ -138,7 +138,6 @@ class WaypointUpdater(object):
         self.pose = msg
 
     def waypoints_cb(self, waypoints):
-        rospy.loginfo('Entered waypoints_cb')
         self.base_waypoints = waypoints
         if not self.waypoints_2d:
             self.waypoints_2d = [[waypoint.pose.pose.position.x, waypoint.pose.pose.position.y] for waypoint in waypoints.waypoints]

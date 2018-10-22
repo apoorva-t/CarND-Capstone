@@ -58,19 +58,19 @@ class Controller(object):
         self.last_time = current_time
 
         throttle = self.throttle_controller.step(vel_error, sample_time)
-        rospy.loginfo('Value of throttle from pid: %f, vel_err: %f', throttle, vel_error)
+        #rospy.loginfo('Value of throttle from pid: %f, vel_err: %f', throttle, vel_error)
         
         brake = 0
 
         if linear_vel == 0.0 and current_vel < 0.1:
         	throttle = 0
         	brake = 700 # N*m - to hold the car in place if we are stopped at a light
-        	rospy.loginfo('Values of throttle= 0, brake = 400, steering = %d', steering)
+        	#rospy.loginfo('Values of throttle= 0, brake = 400, steering = %d', steering)
         elif throttle < .1 and vel_error < 0.0:
         	throttle = 0.0
         	decel = max(self.decel_limit, vel_error)
         	brake = abs(decel) * self.vehicle_mass * self.wheel_radius
-        	rospy.loginfo('Values of throttle: 0, brake: %d, steering: %d', brake, steering)
+        	#rospy.loginfo('Values of throttle: 0, brake: %d, steering: %d', brake, steering)
 
         return throttle, brake, steering
 

@@ -15,8 +15,7 @@ class TLClassifier(object):
         self.light_state = TrafficLight.UNKNOWN
         self.category_dict = {1: "Green", 2: "Yellow", 3: "Red", 4: "off"}
         dirpath = os.getcwd()
-        #print("current directory is: " + dirpath)
-        rospy.loginfo("Current directory for classification is: %s",dirpath)  #tl_detector
+
         PATH_TO_FROZEN_GRAPH = dirpath + '/exported_graphs' + '/frozen_inference_graph.pb'
 
         self.detection_graph = tf.Graph()
@@ -91,7 +90,7 @@ class TLClassifier(object):
                 if output_dict['detection_boxes'].shape[0]:
                     if scores is None:
                         class_name = 'Unknown'
-                        rospy.loginfo("Traffic light state from classifier: %s", class_name)
+                        #rospy.loginfo("Traffic light state from classifier: %s", class_name)
                     else:
                         max_index = np.argmax(scores)
                         if scores[max_index] > min_score_thresh:
@@ -105,7 +104,7 @@ class TLClassifier(object):
                             elif class_name == 'Yellow':
                                 self.light_state = TrafficLight.YELLOW
 
-                            rospy.loginfo("Traffic light state from classifier: %s, score: %f", class_name, scores[max_index])
+                            #rospy.loginfo("Traffic light state from classifier: %s, score: %f", class_name, scores[max_index])
 
 
         return self.light_state

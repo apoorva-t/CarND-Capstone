@@ -180,6 +180,7 @@ class TLDetector(object):
         #rospy.loginfo('Entered process_traffic_lights')
         closest_light = None
         light_wp = None
+        car_position = None
 
         # List of positions that correspond to the line to stop in front of for a given intersection
         stop_line_positions = self.config['stop_line_positions']
@@ -188,19 +189,20 @@ class TLDetector(object):
 
         #TODO find the closest visible traffic light (if one exists)
         diff = len(self.waypoints.waypoints)
-        rospy.loginfo('Closest wp near car: %d', car_position)
-        for i, light in enumerate(self.lights):
-            # Get stopline wp index
-            line = stop_line_positions[i]
-            tmp_light_idx = self.get_closest_waypoint(line[0], line[1])
-            # Find closest stop line waypoint index           
-            d = tmp_light_idx - car_position
-            # If traffic light wp is in front of car and within diff
-            if d >= 0.0 and d < diff:
-                rospy.loginfo('Traffic light wp: %d', tmp_light_idx)
-                diff = d
-                closest_light = light
-                light_wp = tmp_light_idx
+        #rospy.loginfo('Closest wp near car: %d', car_position)
+        if car_position is not None:
+            for i, light in enumerate(self.lights):
+                # Get stopline wp index
+                line = stop_line_positions[i]
+                tmp_light_idx = self.get_closest_waypoint(line[0], line[1])
+                # Find closest stop line waypoint index           
+                d = tmp_light_idx - car_position
+                # If traffic light wp is in front of car and within diff
+                if d >= 0.0 and d < diff:
+                    #rospy.loginfo('Traffic light wp: %d', tmp_light_idx)
+                    diff = d
+                    closest_light = light
+                    light_wp = tmp_light_idx
 
         if closest_light is not None:
             state = self.get_light_state(closest_light)
